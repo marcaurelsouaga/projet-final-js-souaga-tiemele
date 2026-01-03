@@ -1,24 +1,27 @@
 let offres = JSON.parse(localStorage.getItem('babiBNB_offres')) || [];
-let currentIdx = -1;
+let activeIndex = -1;
 
 const sidebar = document.getElementById('sidebar-list');
-const form = document.getElementById('edit-form');
+const editForm = document.getElementById('edit-form');
+const helpMsg = document.getElementById('msg-aide');
 
-function updateSidebar() {
+function refreshSidebar() {
     sidebar.innerHTML = offres.map((o, i) => `
-        <div class="p-3 border rounded bg-gray-50 flex flex-col gap-2">
-            <p class="font-bold text-sm truncate">${o.titre}</p>
+        <div class="p-4 border border-gray-100 rounded-xl bg-gray-50 hover:border-orange-300 transition group">
+            <h4 class="font-bold text-sm text-gray-700 mb-2 truncate">${o.titre}</h4>
             <div class="flex gap-2">
-                <button onclick="load(${i})" class="flex-1 bg-orange-100 text-orange-700 text-[10px] font-bold py-1 rounded">ÉDITER</button>
-                <button onclick="del(${i})" class="flex-1 bg-red-100 text-red-700 text-[10px] font-bold py-1 rounded">SUPPRIMER</button>
+                <button onclick="edit(${i})" class="flex-1 bg-white text-orange-600 border border-orange-200 text-[10px] font-bold py-2 rounded-lg hover:bg-orange-500 hover:text-white transition">MODIFIER</button>
+                <button onclick="remove(${i})" class="bg-red-50 text-red-500 text-[10px] p-2 rounded-lg hover:bg-red-500 hover:text-white transition">🗑</button>
             </div>
         </div>
     `).join('');
 }
 
-window.load = (i) => {
-    currentIdx = i;
+window.edit = (i) => {
+    activeIndex = i;
     const o = offres[i];
+    
+    // Remplissage
     document.getElementById('type').value = o.type;
     document.getElementById('titre').value = o.titre;
     document.getElementById('details').value = o.details;
@@ -26,21 +29,26 @@ window.load = (i) => {
     document.getElementById('prix').value = o.prix;
     document.getElementById('commune').value = o.commune;
     document.getElementById('emplacement').value = o.emplacement;
+
+    // UI Feedback
+    editForm.classList.remove('opacity-40', 'pointer-events-none');
+    helpMsg.classList.add('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-window.del = (i) => {
-    if(confirm("Supprimer cette offre ?")) {
+window.remove = (i) => {
+    if(confirm("Supprimer définitivement ce bien ?")) {
         offres.splice(i, 1);
         localStorage.setItem('babiBNB_offres', JSON.stringify(offres));
-        updateSidebar();
+        refreshSidebar();
+        location.reload(); // Pour vider le formulaire si on supprimait le bien en cours
     }
 };
 
-form.addEventListener('submit', (e) => {
+editForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    if(currentIdx === -1) return alert("Sélectionnez un bien à droite !");
-
-    offres[currentIdx] = {
+    offres[activeIndex] = {
+        ...offres[activeIndex],
         type: document.getElementById('type').value,
         titre: document.getElementById('titre').value,
         details: document.getElementById('details').value,
@@ -49,10 +57,9 @@ form.addEventListener('submit', (e) => {
         commune: document.getElementById('commune').value,
         emplacement: document.getElementById('emplacement').value
     };
-
     localStorage.setItem('babiBNB_offres', JSON.stringify(offres));
-    alert("Modification réussie !");
-    location.href = 'index.html';
+    alert("Modification enregistrée !");
+    window.location.href = 'index.html';
 });
 
-updateSidebar();
+refreshSidebar();

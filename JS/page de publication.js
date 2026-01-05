@@ -1,13 +1,21 @@
 const STORAGE_KEY = 'babiBNB_offres';
+// On récupère les offres existantes (celles de l'accueil ou des ajouts précédents)
 let offres = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 let editIndex = -1;
 
 const form = document.getElementById('bien-form');
 const sidebar = document.getElementById('sidebar-list');
 const compteur = document.getElementById('compteur');
+const formTitle = document.getElementById('form-title'); // Ajout pour modifier le titre
 
 function refreshSidebar() {
-    if (compteur) compteur.innerText = offres.length;
+    // Mise à jour du compteur en haut de page
+    if (compteur) {
+        compteur.innerText = offres.length;
+    }
+
+    if (!sidebar) return;
+
     sidebar.innerHTML = offres.map((o, i) => `
         <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
             <h3 class="font-bold text-gray-800 mb-1 text-sm">${o.titre}</h3>
@@ -36,8 +44,6 @@ form.addEventListener('submit', (e) => {
 
     if (editIndex === -1) {
         offres.push(nouvelleOffre);
-        
-        // UTILISATION DE SWEETALERT2 POUR L'AJOUT
         Swal.fire({
             title: "Produit ajouté",
             text: `L'annonce "${nouvelleOffre.titre}" a été publiée avec succès`,
@@ -45,22 +51,21 @@ form.addEventListener('submit', (e) => {
             draggable: true,
             confirmButtonColor: "#2563eb"
         });
-
     } else {
         offres[editIndex] = nouvelleOffre;
         editIndex = -1;
         
-        // UTILISATION DE SWEETALERT2 POUR LA MODIFICATION
         Swal.fire({
             title: "Produit modifié",
-            text: "Les modifications ont été enregistrées",
+            text: "Les modifications ont été enregistrées avec succès",
             icon: "success",
             draggable: true,
             confirmButtonColor: "#2563eb"
         });
 
+        // On remet le formulaire à l'état initial
         document.getElementById('submit-btn').innerText = "Publier l'offre";
-        document.getElementById('form-title').innerText = "Publier une offre";
+        if (formTitle) formTitle.innerText = "Publier une offre";
     }
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(offres));
@@ -69,7 +74,6 @@ form.addEventListener('submit', (e) => {
 });
 
 window.deleteOffre = (i) => {
-    // Bonus : Utilisation de Swal pour la confirmation de suppression
     Swal.fire({
         title: "Êtes-vous sûr ?",
         text: "Cette action est irréversible !",
@@ -99,9 +103,13 @@ window.prefillForm = (i) => {
     document.getElementById('prix').value = o.prix;
     document.getElementById('commune').value = o.commune;
     document.getElementById('emplacement').value = o.emplacement;
+
+    // Changement visuel pour indiquer la modification
     document.getElementById('submit-btn').innerText = "Enregistrer les modifications";
-    document.getElementById('form-title').innerText = "Modifier l'offre";
+    if (formTitle) formTitle.innerText = "Modifier l'offre : " + o.titre.toUpperCase();
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
+// Très important : lancer le rafraîchissement dès le chargement
 refreshSidebar();

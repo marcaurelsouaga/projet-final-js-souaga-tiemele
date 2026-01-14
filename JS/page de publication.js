@@ -1,15 +1,15 @@
 const STORAGE_KEY = 'babiBNB_offres';
-// On récupère les offres existantes (celles de l'accueil ou des ajouts précédents)
+// On récupère les offres existantes
 let offres = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 let editIndex = -1;
 
-const form = document.getElementById('bien-form');
-const sidebar = document.getElementById('sidebar-list');
-const compteur = document.getElementById('compteur');
-const formTitle = document.getElementById('form-title'); // Ajout pour modifier le titre
+// Utilisation de querySelector
+const form = document.querySelector('#bien-form');
+const sidebar = document.querySelector('#sidebar-list');
+const compteur = document.querySelector('#compteur');
+const formTitle = document.querySelector('#form-title');
 
 function refreshSidebar() {
-    // Mise à jour du compteur en haut de page
     if (compteur) {
         compteur.innerText = offres.length;
     }
@@ -32,14 +32,15 @@ function refreshSidebar() {
 form.addEventListener('submit', (e) => {
     e.preventDefault();
     
+    // On récupère bien la valeur de l'input #photo ici
     const nouvelleOffre = {
-        type: document.getElementById('type').value,
-        titre: document.getElementById('titre').value,
-        details: document.getElementById('details').value,
-        photo: document.getElementById('photo').value,
-        prix: document.getElementById('prix').value,
-        commune: document.getElementById('commune').value,
-        emplacement: document.getElementById('emplacement').value
+        type: document.querySelector('#type').value,
+        titre: document.querySelector('#titre').value,
+        details: document.querySelector('#details').value,
+        photo: document.querySelector('#photo').value, 
+        prix: document.querySelector('#prix').value,
+        commune: document.querySelector('#commune').value,
+        emplacement: document.querySelector('#emplacement').value
     };
 
     if (editIndex === -1) {
@@ -48,7 +49,6 @@ form.addEventListener('submit', (e) => {
             title: "Produit ajouté",
             text: `L'annonce "${nouvelleOffre.titre}" a été publiée avec succès`,
             icon: "success",
-            draggable: true,
             confirmButtonColor: "#2563eb"
         });
     } else {
@@ -59,12 +59,10 @@ form.addEventListener('submit', (e) => {
             title: "Produit modifié",
             text: "Les modifications ont été enregistrées avec succès",
             icon: "success",
-            draggable: true,
             confirmButtonColor: "#2563eb"
         });
 
-        // On remet le formulaire à l'état initial
-        document.getElementById('submit-btn').innerText = "Publier l'offre";
+        document.querySelector('#submit-btn').innerText = "Publier l'offre";
         if (formTitle) formTitle.innerText = "Publier une offre";
     }
 
@@ -96,20 +94,18 @@ window.deleteOffre = (i) => {
 window.prefillForm = (i) => {
     editIndex = i;
     const o = offres[i];
-    document.getElementById('type').value = o.type;
-    document.getElementById('titre').value = o.titre;
-    document.getElementById('details').value = o.details;
-    document.getElementById('photo').value = o.photo;
-    document.getElementById('prix').value = o.prix;
-    document.getElementById('commune').value = o.commune;
-    document.getElementById('emplacement').value = o.emplacement;
+    document.querySelector('#type').value = o.type;
+    document.querySelector('#titre').value = o.titre;
+    document.querySelector('#details').value = o.details;
+    document.querySelector('#photo').value = o.photo;
+    document.querySelector('#prix').value = o.prix;
+    document.querySelector('#commune').value = o.commune;
+    document.querySelector('#emplacement').value = o.emplacement;
 
-    // Changement visuel pour indiquer la modification
-    document.getElementById('submit-btn').innerText = "Enregistrer les modifications";
+    document.querySelector('#submit-btn').innerText = "Enregistrer les modifications";
     if (formTitle) formTitle.innerText = "Modifier l'offre : " + o.titre.toUpperCase();
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// Très important : lancer le rafraîchissement dès le chargement
 refreshSidebar();

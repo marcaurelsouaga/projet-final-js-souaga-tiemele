@@ -3,8 +3,7 @@ const STORAGE_KEY = 'babiBNB_offres';
 let offres = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
 /**
- * FORCE L'AFFICHAGE DES 3 CARTES DE L'IMAGE
- * Si le stockage est vide ou contient moins de 3 offres, on réinitialise
+ * FORCE L'AFFICHAGE DES 3 CARTES PAR DÉFAUT
  */
 if (offres.length < 3) {
     offres = [
@@ -30,12 +29,12 @@ if (offres.length < 3) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(offres));
 }
 
-// 2. Sélection des éléments du DOM
-const listeOffres = document.getElementById('listeOffres');
-const compteur = document.getElementById('compteur');
+// 2. Sélection des éléments du DOM avec querySelector
+const listeOffres = document.querySelector('#listeOffres');
+const compteur = document.querySelector('#compteur');
 
 /**
- * Affiche les cartes avec l'alignement et l'effet zoom
+ * Affiche les cartes
  */
 function afficherAccueil() {
     if (compteur) {
@@ -47,13 +46,17 @@ function afficherAccueil() {
     listeOffres.innerHTML = '';
 
     offres.forEach(offre => {
-        // Le code HTML injecté contient l'effet zoom (hover:scale-105)
+        // AJOUT DE LA SÉCURITÉ ONERROR :
+        // Si le lien de l'image est mauvais, on affiche img/logo.png par défaut.
         const carteHTML = `
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col h-full transform transition-transform duration-300 hover:scale-105 cursor-pointer">
                 <div class="p-5 flex-grow">
                     <h3 class="font-bold text-xl text-gray-800 mb-2 uppercase">${offre.titre}</h3>
                     <p class="text-gray-600 text-sm mb-4 line-clamp-3">${offre.details}</p>
-                    <img src="${offre.photo}" alt="${offre.titre}" class="w-full h-48 object-cover rounded-md mb-4 border border-gray-100">
+                    <img src="${offre.photo}" 
+                         onerror="this.src='img/logo.png'" 
+                         alt="${offre.titre}" 
+                         class="w-full h-48 object-cover rounded-md mb-4 border border-gray-100">
                     <p class="font-bold text-gray-800">Prix: ${parseInt(offre.prix).toLocaleString()} FCFA</p>
                 </div>
             </div>
